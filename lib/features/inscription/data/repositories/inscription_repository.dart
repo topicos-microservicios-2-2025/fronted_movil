@@ -62,7 +62,7 @@ class InscriptionRepository {
   Future<Map<String, dynamic>> _pollJob(String shortId) async {
     final pollUrl = Uri.parse('$baseUrl/inscripcion/tasks/gettask/$shortId');
     const maxAttempts = 30;
-    const delay = Duration(seconds: 5);
+    const delay = Duration(seconds: 2);
     for (int attempt = 0; attempt < maxAttempts; attempt++) {
       final response = await http.get(pollUrl);
       if (response.statusCode == 200) {
