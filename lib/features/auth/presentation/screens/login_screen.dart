@@ -15,7 +15,7 @@ class _LoginScreenState extends State<LoginScreen>
   final _formKey = GlobalKey<FormState>();
   final _registroController = TextEditingController();
   final _ciController = TextEditingController();
-  
+
   late AnimationController _fadeController;
   late AnimationController _slideController;
   late Animation<double> _fadeAnimation;
@@ -37,21 +37,14 @@ class _LoginScreenState extends State<LoginScreen>
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
+    );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutBack,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutBack),
+        );
 
     _fadeController.forward();
     _slideController.forward();
@@ -86,10 +79,24 @@ class _LoginScreenState extends State<LoginScreen>
             builder: (context, authProvider, child) {
               // Navegar automáticamente después del login exitoso
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (authProvider.status == AuthStatus.success) {
+                if (authProvider.status == AuthStatus.success &&
+                    authProvider.currentStudent != null) {
+                  final student = authProvider.currentStudent!;
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (context) => const InscriptionScreen(),
+                      builder: (context) => InscriptionScreen(
+                        userData: {
+                          'id': student.id,
+                          'nombre': student.nombre,
+                          'apellidoPaterno': student.apellidoPaterno,
+                          'apellidoMaterno': student.apellidoMaterno,
+                          'registro': student.registro,
+                          'ci': student.ci,
+                          'carrera': student.carrera,
+                          'planEstudios': student.planEstudios,
+                          'estado': student.estado,
+                        },
+                      ),
                     ),
                   );
                 }
@@ -133,11 +140,7 @@ class _LoginScreenState extends State<LoginScreen>
             color: Colors.white.withOpacity(0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
-            Icons.school,
-            size: 60,
-            color: Colors.white,
-          ),
+          child: const Icon(Icons.school, size: 60, color: Colors.white),
         ),
         const SizedBox(height: 20),
         const Text(
@@ -185,8 +188,9 @@ class _LoginScreenState extends State<LoginScreen>
               label: 'Número de Registro',
               icon: Icons.person,
               keyboardType: TextInputType.number,
-              enabled: authProvider.status != AuthStatus.loading &&
-                       authProvider.status != AuthStatus.loadingPolling,
+              enabled:
+                  authProvider.status != AuthStatus.loading &&
+                  authProvider.status != AuthStatus.loadingPolling,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Ingresa tu número de registro';
@@ -202,8 +206,9 @@ class _LoginScreenState extends State<LoginScreen>
               controller: _ciController,
               label: 'Cédula de Identidad',
               icon: Icons.credit_card,
-              enabled: authProvider.status != AuthStatus.loading &&
-                       authProvider.status != AuthStatus.loadingPolling,
+              enabled:
+                  authProvider.status != AuthStatus.loading &&
+                  authProvider.status != AuthStatus.loadingPolling,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Ingresa tu cédula de identidad';
@@ -252,14 +257,18 @@ class _LoginScreenState extends State<LoginScreen>
         ),
         filled: true,
         fillColor: enabled ? Colors.white : Colors.grey[100],
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
       ),
     );
   }
 
   Widget _buildLoginButton(AuthProvider authProvider) {
-    final isLoading = authProvider.status == AuthStatus.loading ||
-                     authProvider.status == AuthStatus.loadingPolling;
+    final isLoading =
+        authProvider.status == AuthStatus.loading ||
+        authProvider.status == AuthStatus.loadingPolling;
 
     return SizedBox(
       width: double.infinity,
@@ -286,10 +295,7 @@ class _LoginScreenState extends State<LoginScreen>
               )
             : const Text(
                 'Iniciar Sesión',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
       ),
     );
@@ -327,7 +333,7 @@ class _LoginScreenState extends State<LoginScreen>
 
   Widget _buildLoadingMessage(AuthProvider authProvider) {
     String message = '';
-    
+
     switch (authProvider.status) {
       case AuthStatus.loading:
         message = 'Conectando con el servidor...';

@@ -57,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen>
   final _formKey = GlobalKey<FormState>();
   final _registroController = TextEditingController();
   final _ciController = TextEditingController();
-  
+
   late AnimationController _fadeController;
   late AnimationController _slideController;
   late Animation<double> _fadeAnimation;
@@ -67,7 +67,8 @@ class _LoginScreenState extends State<LoginScreen>
   String _errorMessage = '';
   EstudianteModel? _currentStudent;
 
-  static const String baseUrl = 'http://192.168.0.14:3000/api/inscripcion/tasks';
+  static const String baseUrl =
+      'http://192.168.0.14:3000/api/inscripcion/tasks';
   static const int maxRetries = 15;
   static const Duration pollingInterval = Duration(seconds: 2);
 
@@ -87,21 +88,14 @@ class _LoginScreenState extends State<LoginScreen>
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
+    );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutBack,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutBack),
+        );
 
     _fadeController.forward();
     _slideController.forward();
@@ -124,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen>
       body: jsonEncode({
         'task': 'get_estudiante',
         'data': {},
-        'callback': 'http://localhost:5000/callback'
+        'callback': 'http://localhost:5000/callback',
       }),
     );
 
@@ -139,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen>
     // Paso 2: Polling para obtener resultado
     for (int attempt = 0; attempt < maxRetries; attempt++) {
       await Future.delayed(pollingInterval);
-      
+
       try {
         final getResponse = await http.get(
           Uri.parse('$baseUrl/gettask/$shortId'),
@@ -148,21 +142,25 @@ class _LoginScreenState extends State<LoginScreen>
         if (getResponse.statusCode == 200) {
           final data = jsonDecode(getResponse.body);
           final job = data['job'];
-          
+
           if (job != null) {
             if (job['state'] == 'completed') {
               final returnValue = job['returnvalue'];
-              
+
               if (returnValue['success'] == true) {
                 final estudiantesJson = returnValue['estudiantes'] as List;
                 return estudiantesJson
                     .map((json) => EstudianteModel.fromJson(json))
                     .toList();
               } else {
-                throw Exception('Error en la respuesta del servidor: ${returnValue['message'] ?? 'Sin mensaje'}');
+                throw Exception(
+                  'Error en la respuesta del servidor: ${returnValue['message'] ?? 'Sin mensaje'}',
+                );
               }
             } else if (job['state'] == 'failed') {
-              throw Exception('La tarea falló: ${job['error'] ?? 'Error desconocido'}');
+              throw Exception(
+                'La tarea falló: ${job['error'] ?? 'Error desconocido'}',
+              );
             }
           }
         }
@@ -170,12 +168,16 @@ class _LoginScreenState extends State<LoginScreen>
       } catch (e) {
         // Ignora errores temporales y continúa el polling
         if (attempt == maxRetries - 1) {
-          throw Exception('Tiempo de espera agotado después de $maxRetries intentos. Último error: $e');
+          throw Exception(
+            'Tiempo de espera agotado después de $maxRetries intentos. Último error: $e',
+          );
         }
       }
     }
 
-    throw Exception('No se pudo obtener la información después de $maxRetries intentos.');
+    throw Exception(
+      'No se pudo obtener la información después de $maxRetries intentos.',
+    );
   }
 
   EstudianteModel? _validateCredentials(
@@ -210,7 +212,7 @@ class _LoginScreenState extends State<LoginScreen>
       setState(() {
         _status = AuthStatus.loadingPolling;
       });
-      
+
       final estudiantes = await _getEstudiantes();
 
       // Validar credenciales
@@ -221,12 +223,24 @@ class _LoginScreenState extends State<LoginScreen>
           _currentStudent = student;
           _status = AuthStatus.success;
         });
-        
+
         // Navegar a la pantalla de inscripción
         if (mounted) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (context) => const InscriptionScreen(),
+              builder: (context) => InscriptionScreen(
+                userData: {
+                  'id': student.id,
+                  'nombre': student.nombre,
+                  'apellidoPaterno': student.apellidoPaterno,
+                  'apellidoMaterno': student.apellidoMaterno,
+                  'registro': student.registro,
+                  'ci': student.ci,
+                  'carrera': student.carrera,
+                  'planEstudios': student.planEstudios,
+                  'estado': student.estado,
+                },
+              ),
             ),
           );
         }
@@ -296,11 +310,7 @@ class _LoginScreenState extends State<LoginScreen>
             color: Colors.white.withOpacity(0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
-            Icons.school,
-            size: 60,
-            color: Colors.white,
-          ),
+          child: const Icon(Icons.school, size: 60, color: Colors.white),
         ),
         const SizedBox(height: 20),
         const Text(
@@ -348,8 +358,9 @@ class _LoginScreenState extends State<LoginScreen>
               label: 'Número de Registro',
               icon: Icons.person,
               keyboardType: TextInputType.number,
-              enabled: _status != AuthStatus.loading &&
-                       _status != AuthStatus.loadingPolling,
+              enabled:
+                  _status != AuthStatus.loading &&
+                  _status != AuthStatus.loadingPolling,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Ingresa tu número de registro';
@@ -366,8 +377,9 @@ class _LoginScreenState extends State<LoginScreen>
               label: 'Cédula de Identidad',
               icon: Icons.lock,
               obscureText: true,
-              enabled: _status != AuthStatus.loading &&
-                       _status != AuthStatus.loadingPolling,
+              enabled:
+                  _status != AuthStatus.loading &&
+                  _status != AuthStatus.loadingPolling,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Ingresa tu cédula de identidad';
@@ -418,14 +430,17 @@ class _LoginScreenState extends State<LoginScreen>
         ),
         filled: true,
         fillColor: enabled ? Colors.white : Colors.grey[100],
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
       ),
     );
   }
 
   Widget _buildLoginButton() {
-    final isLoading = _status == AuthStatus.loading ||
-                     _status == AuthStatus.loadingPolling;
+    final isLoading =
+        _status == AuthStatus.loading || _status == AuthStatus.loadingPolling;
 
     return SizedBox(
       width: double.infinity,
@@ -452,10 +467,7 @@ class _LoginScreenState extends State<LoginScreen>
               )
             : const Text(
                 'Iniciar Sesión',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
       ),
     );
@@ -493,7 +505,7 @@ class _LoginScreenState extends State<LoginScreen>
 
   Widget _buildLoadingMessage() {
     String message = '';
-    
+
     switch (_status) {
       case AuthStatus.loading:
         message = 'Conectando con el servidor...';
@@ -539,10 +551,7 @@ class _LoginScreenState extends State<LoginScreen>
 
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
-      _login(
-        _registroController.text.trim(),
-        _ciController.text.trim(),
-      );
+      _login(_registroController.text.trim(), _ciController.text.trim());
     }
   }
 }
