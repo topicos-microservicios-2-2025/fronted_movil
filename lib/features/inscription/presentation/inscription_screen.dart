@@ -422,7 +422,7 @@ class _InscriptionScreenState extends State<InscriptionScreen> {
     try {
       final job = await repo.getEstudianteWithOferta(
         registro: registro,
-        callbackUrl: 'http://192.168.0.14:5000/callback',
+        callbackUrl: 'http://10.55.7.213:5000/callback',
       );
       final returnValue = job['returnvalue'] as Map<String, dynamic>?;
 
@@ -482,7 +482,7 @@ class _InscriptionScreenState extends State<InscriptionScreen> {
     try {
       final job = await repo.getEstudianteWithOferta(
         registro: registro is int ? registro : int.parse(registro.toString()),
-        callbackUrl: 'http://192.168.0.14:5000/callback',
+        callbackUrl: 'http://10.55.7.213:5000/callback',
       );
       final returnValue = job['returnvalue'] as Map<String, dynamic>?;
 
@@ -1492,7 +1492,7 @@ class _InscriptionScreenState extends State<InscriptionScreen> {
       final job = await repo.createInscripcionMaterias(
         estudianteId: estudianteId!,
         grupoMateriasIds: grupoMateriasIds,
-        callbackUrl: 'http://192.168.0.14:5000/callback',
+        callbackUrl: 'http://10.55.7.213:5000/callback',
       );
 
       // Extraer información del job

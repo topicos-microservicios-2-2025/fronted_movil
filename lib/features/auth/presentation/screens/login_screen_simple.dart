@@ -68,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen>
   EstudianteModel? _currentStudent;
 
   static const String baseUrl =
-      'http://192.168.0.14:3000/api/inscripcion/tasks';
+      'http://10.55.7.213:3000/api/inscripcion/tasks';
   static const int maxRetries = 15;
   static const Duration pollingInterval = Duration(seconds: 2);
 

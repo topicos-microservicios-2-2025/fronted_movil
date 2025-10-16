@@ -73,7 +73,7 @@ class _JobTrackingScreenState extends State<JobTrackingScreen>
     try {
       final response = await http.get(
         Uri.parse(
-          'http://192.168.0.14:3000/api/inscripcion/tasks/${widget.shortId}',
+          'http://10.55.7.213:3000/api/inscripcion/tasks/${widget.shortId}',
         ),
       );
 

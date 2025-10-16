@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class InscriptionRepository {
-  final String baseUrl = 'http://192.168.0.14:3000/api';
+  final String baseUrl = 'http://10.55.7.213:3000/api';
 
   /// Paso 1: Buscar estudiante y oferta académica (con polling)
   Future<Map<String, dynamic>> getEstudianteWithOferta({required int registro, required String callbackUrl}) async {
